@@ -2,6 +2,7 @@ package com.nowcoder.controller;
 
 import com.nowcoder.model.*;
 import com.nowcoder.service.CommentService;
+import com.nowcoder.service.LikeService;
 import com.nowcoder.service.QuestionService;
 import com.nowcoder.service.UserService;
 import com.nowcoder.util.WendaUtil;
@@ -36,6 +37,9 @@ public class QuestionController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    LikeService likeService;
+
     @RequestMapping(value = "/question/{qid}", method = {RequestMethod.GET})
     public String questionDetail(Model model, @PathVariable("qid") int qid) {
         Question question = questionService.getById(qid);
@@ -45,6 +49,13 @@ public class QuestionController {
         for (Comment comment : commentList) {
             ViewObject vo = new ViewObject();
             vo.set("comment", comment);
+
+            if(hostHolder.getUser()==null){
+                vo.set("liked",0);
+            }else {
+                vo.set("liked",likeService.getLikeStatus(hostHolder.getUser().getId(),EntityType.ENTITY_COMMENT,comment.getId()));
+            }
+            vo.set("likeCount",likeService.getLikeCount(EntityType.ENTITY_COMMENT,comment.getId()));
             vo.set("user", userService.getUser(comment.getUserId()));
             vos.add(vo);
         }
