@@ -1,7 +1,12 @@
 package com.nowcoder.controller;
 
+import com.nowcoder.aync.EventModel;
+import com.nowcoder.aync.EventProducer;
+import com.nowcoder.aync.EventType;
+import com.nowcoder.model.Comment;
 import com.nowcoder.model.EntityType;
 import com.nowcoder.model.HostHolder;
+import com.nowcoder.service.CommentService;
 import com.nowcoder.service.LikeService;
 import com.nowcoder.util.WendaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +27,12 @@ public class LikeContoller {
     @Autowired
     HostHolder hostHolder;
 
+    @Autowired
+    CommentService commentService;
+    @Autowired
+    EventProducer eventProducer;
+
+
     @RequestMapping(path = {"/like"}, method = {RequestMethod.POST})
     @ResponseBody
     public String like(@RequestParam("commentId") int commentId) {
@@ -38,6 +49,12 @@ public class LikeContoller {
         if (hostHolder.getUser()==null){
             return WendaUtil.getJSONString(999);
         }
+        Comment comment=commentService.getCommentById(commentId);
+        eventProducer.fireEvent(new EventModel(EventType.LIKE)
+                .setActorId(hostHolder.getUser().getId()).setEntityId(commentId)
+                .setEntityType(EntityType.ENTITY_COMMENT)
+                .setExt("questionId",String.valueOf(comment.getEntityId()))
+                .setEntityOwnerId(comment.getUserId()));
 
         long likeCount=likeService.disLike(hostHolder.getUser().getId(), EntityType.ENTITY_COMMENT,commentId);
         return WendaUtil.getJSONString(0,String.valueOf(likeCount));

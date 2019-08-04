@@ -62,24 +62,32 @@ public class MessageController {
 
     @RequestMapping(path = {"/msg/detail"}, method = {RequestMethod.GET})
     public String conversationDetail(Model model, @Param("conversationId") String conversationId) {
+
         try {
+            // 得到两个账号之间的会话列表数据
             List<Message> conversationList = messageService.getConversationDetail(conversationId, 0, 10);
             List<ViewObject> messages = new ArrayList<>();
+
+            // 循环遍历会话列表,每条会话数据到前端就是一个会话框
             for (Message msg : conversationList) {
                 ViewObject vo = new ViewObject();
                 vo.set("message", msg);
+                // 得到发送消息的用户信息
                 User user = userService.getUser(msg.getFromId());
                 if (user == null) {
                     continue;
                 }
+                // 设置头像以及用户ID
                 vo.set("headUrl", user.getHeadUrl());
                 vo.set("userId", user.getId());
+                // 把每一条消息放到消息集合里面去
                 messages.add(vo);
             }
             model.addAttribute("messages", messages);
         } catch (Exception e) {
-            logger.error("获取详情消息失败" + e.getMessage());
+            logger.error("获取消息详情失败" + e.getMessage());
         }
+        // 这里还应该把数据库里面会话的阅读状态设置为已经阅读,也就是has_read修改为1
         return "letterDetail";
     }
 

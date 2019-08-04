@@ -1,5 +1,8 @@
 package com.nowcoder.controller;
 
+import com.nowcoder.aync.EventModel;
+import com.nowcoder.aync.EventProducer;
+import com.nowcoder.aync.EventType;
 import com.nowcoder.service.UserService;
 import com.nowcoder.util.WendaUtil;
 import org.apache.commons.lang.StringUtils;
@@ -24,6 +27,12 @@ public class LoginController {
     @Autowired
     UserService userService;
 
+
+
+    @Autowired
+    EventProducer eventProducer;
+
+
     @RequestMapping(path = {"/reg/"}, method = {RequestMethod.POST})
     public String reg(Model model, @RequestParam("username") String username,
                       @RequestParam("password") String password,
@@ -39,6 +48,8 @@ public class LoginController {
                     cookie.setMaxAge(3600*24*5);
                 }
                 response.addCookie(cookie);
+
+
                 if (StringUtils.isNotBlank(next)) {
                     return "redirect:" + next;
                 }
@@ -75,6 +86,11 @@ public class LoginController {
                 if (rememberme) {
                     cookie.setMaxAge(3600*24*5);
                 }
+
+            /*    eventProducer.fireEvent(new EventModel(EventType.LOGIN)
+                        .setExt("username",username).setExt("email","981376076@qq.com")
+                        .setActorId((int)map.get("userId")));
+*/
                 response.addCookie(cookie);
                 if (StringUtils.isNotBlank(next)) {
                     return "redirect:" + next;
