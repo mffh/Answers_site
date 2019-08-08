@@ -34,5 +34,8 @@ public interface CommentDAO {
             " where id=#{id}"})
     Comment getCommentById(int id);
 
+    @Select({"select count(id) from ",TABLE_NAME," where user_id=#{user_id}"})
+    int getUserCommentCount(int userId);
+
 
 }

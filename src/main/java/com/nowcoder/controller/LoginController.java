@@ -45,9 +45,9 @@ public class LoginController {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");
                 if (rememberme) {
-                    cookie.setMaxAge(3600*24*5);
+                    cookie.setMaxAge(3600*24*5);//设置过期时间
                 }
-                response.addCookie(cookie);
+                response.addCookie(cookie);//服务器将数据放到客户端上
 
 
                 if (StringUtils.isNotBlank(next)) {
