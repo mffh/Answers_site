@@ -33,39 +33,6 @@ public class LoginController {
     EventProducer eventProducer;
 
 
-    @RequestMapping(path = {"/reg/"}, method = {RequestMethod.POST})
-    public String reg(Model model, @RequestParam("username") String username,
-                      @RequestParam("password") String password,
-                      @RequestParam("next") String next,
-                      @RequestParam(value="rememberme", defaultValue = "false") boolean rememberme,
-                      HttpServletResponse response) {
-        try {
-            //test
-            Map<String, Object> map = userService.register(username, password);
-            if (map.containsKey("ticket")) {
-                Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
-                cookie.setPath("/");
-                if (rememberme) {
-                    cookie.setMaxAge(3600*24*5);//设置过期时间
-                }
-                response.addCookie(cookie);//服务器将数据放到客户端上
-
-
-                if (StringUtils.isNotBlank(next)) {
-                    return "redirect:" + next;
-                }
-                return "redirect:/";
-            } else {
-                model.addAttribute("msg", map.get("msg"));
-                return "login";
-            }
-
-        } catch (Exception e) {
-            logger.error("注册异常" + e.getMessage());
-            model.addAttribute("msg", "服务器错误");
-            return "login";
-        }
-    }
 
     @RequestMapping(path = {"/reglogin"}, method = {RequestMethod.GET})
     public String regloginPage(Model model, @RequestParam(value = "next", required = false) String next) {
