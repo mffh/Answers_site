@@ -4,6 +4,7 @@ import com.nowcoder.dao.LoginTicketDAO;
 import com.nowcoder.dao.UserDAO;
 import com.nowcoder.model.LoginTicket;
 import com.nowcoder.model.User;
+import com.nowcoder.util.Jwt.Jwt;
 import com.nowcoder.util.WendaUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     @Autowired
     private UserDAO userDAO;
+
+    @Autowired Jwt jwt;
 
     @Autowired
     private LoginTicketDAO loginTicketDAO;
@@ -58,7 +61,13 @@ public class UserService {
         userDAO.addUser(user);
 
         // 登陆
-        String ticket = addLoginTicket(user.getId());
+        Map<String, Object> payload = new HashMap<String ,Object>();
+        Date date = new Date();
+        payload.put("uid",user.getId());
+        payload.put("iat",date.getTime());
+        payload.put("ext", date.getTime() + 3600 * 60 * 10);
+        String ticket = Jwt.createToken(payload);
+        //String ticket = addLoginTicket(user.getId());
         map.put("ticket", ticket);
         return map;
     }
@@ -87,8 +96,13 @@ public class UserService {
             map.put("msg", "密码不正确");
             return map;
         }
-
-        String ticket = addLoginTicket(user.getId());
+        Map<String, Object> payload = new HashMap<String ,Object>();
+        Date date = new Date();
+        payload.put("uid",user.getId());
+        payload.put("iat",date.getTime());
+        payload.put("ext", date.getTime() + 3600 * 24);
+        String ticket = Jwt.createToken(payload);
+        //String ticket = addLoginTicket(user.getId());
         map.put("ticket", ticket);
         return map;
     }
